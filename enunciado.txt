@@ -1,0 +1,64 @@
+Trabalho Final - Descrição
+TRABALHO FINAL DE REDES DE COMPUTADORES I - 2015/1
+
+Prazo máximo para entrega do trabalho (pelo Moodle): 21/6 às 23:55
+
+O trabalho consiste em desenvolver uma ferramenta para configuração automática de topologias de rede. A ferramenta deve receber como parâmetros de entrada o nome de um arquivo de descrição da topologia (conforme formato especificado) e um endereço de rede no formato CIDR. A ferramenta deve apresentar na saída a configuração da topologia usando o endereço de rede indicado. A saída deve respeitar o formato estabelecido.
+
+Formato do arquivo de descrição da topologia
+
+#NETWORK
+<net_name>, <num_nodes>
+#ROUTER
+<router_name>, <num_ports>, <(net|router)_name0>, <(net|router)_name1>, …, <(net|router)_nameN>
+
+Formato de saída
+
+#NETWORK
+<net_name>, <net_address>, <net_mask>, <IP_range>
+#ROUTER
+<router_name>, <num_ports>, <IP0>, <net_mask0>, <IP1> , <net_mask1>, …, <IPN> , <net_maskN>
+#ROUTERTABLE
+<router_name>, <net_dest>, <net_mask>, <nexthop>, <port>
+
+Modo de execução da ferramenta
+$ topoconfig <topologia> <endereço/prefix>
+
+EXEMPLO:
+
+Arquivo topologia.txt
+
+#NETWORK
+net1, 126
+net2, 126
+#ROUTER
+r1, 2, net1, net2
+
+Execução:
+
+$ topoconfig topologia.txt 200.20.10.0/24
+#NETWORK
+net1, 200.20.10.0, 255.255.255.128, 200.20.10.1-200.20.10.126
+net2, 200.20.10.128, 255.255.255.128, 200.20.10.129-200.20.10.254
+#ROUTER
+r1, 2, 200.20.10.1, 255.255.255.128, 200.20.10.129, 255.255.255.128
+#ROUTERTABLE
+r1, 200.20.10.0, 255.255.255.128, 0.0.0.0, 0
+r1, 200.20.10.128, 255.255.255.128, 0.0.0.0, 1
+
+Detalhes para implementação da ferramenta:
+- a ferramenta deve ser executada a partir de um terminal por linha de comando de acordo com o exemplo apresentado - não deve ser necessário utilizar uma IDE para executar a ferramenta!!!
+- a ferramenta pode ser implementada em qualquer linguagem
+- a saída deve respeitar EXATAMENTE o formato apresentado
+
+Itens a serem entregues (arquivo zip)
+- código fonte e executável
+- relatório (em pdf) contendo: (i) detalhes de implementação (linguagem, classes, principais métodos); (ii) descrição de como utilizar a ferramenta; (iii) limitações da ferramenta implementada e dificuldades de implementação
+
+OBSERVAÇÕES
+- O trabalho deve ser realizado em grupos de no máximo 2 alunos.
+- Não serão aceitos trabalhos atrasados e/ou enviados por e-mail.
+- Trabalhos que não compilam ou que não executam não serão avaliados.
+- Todos os trabalhos serão analisados e comparados. Caso seja identificada cópia de trabalhos, todos os trabalhos envolvidos receberão nota ZERO.
+
+
