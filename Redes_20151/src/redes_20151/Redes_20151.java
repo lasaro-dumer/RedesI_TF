@@ -79,17 +79,17 @@ public class Redes_20151 {
 
                 switch (tipo) {
                     case Network:
-                        String net_name = st.nextToken();
+                        String net_name = st.nextToken().trim();
                         int num_nodes = Integer.parseInt(st.nextToken().trim());
                         Network n = new Network(net_name, num_nodes);
                         this.networkElements.add(n);
                         break;
                     case Router:
-                        String router_name = st.nextToken();
+                        String router_name = st.nextToken().trim();
                         int num_ports = Integer.parseInt(st.nextToken().trim());
                         List<String> connections = new ArrayList<>();
                         while (st.hasMoreElements()) {
-                            String connected = st.nextToken();
+                            String connected = st.nextToken().trim();
                             connections.add(connected);
                         }
                         Router r = new Router(router_name, num_ports, connections);
@@ -133,14 +133,16 @@ public class Redes_20151 {
         String ipRede = redeCIDR.substring(0, redeCIDR.lastIndexOf("/"));
         int maxHosts = (int) Math.pow(2, (32 - Integer.parseInt(redeCIDR.substring(redeCIDR.lastIndexOf("/") + 1))));
         System.out.println("maxHosts=" + maxHosts);
-
+        
+        int qtdSubRedes = redes.size();
+        
+        /*
         InetAddress ip = InetAddress.getByName(ipRede);
         byte[] bytesRedeBase = ip.getAddress();
         for (byte b : bytesRedeBase) {
             System.out.print((b & 0xFF) + ".");
         }
         System.out.println();
-        /*
          bytesRedeBase[3] += 1;
         
          System.out.println(bytesRedeBase[3] & 0xFF);
