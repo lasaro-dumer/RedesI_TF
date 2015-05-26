@@ -10,7 +10,7 @@ package redes_20151;
  *
  * @author lasaro
  */
-class Network {
+class Network extends NetworkElement{
 
     private String net_name;
     private int num_nodes;
@@ -33,6 +33,12 @@ class Network {
     public int getNumNodes() {
         return num_nodes;
     }
-    
-    
+
+    @Override
+    public String toString() {
+        String ret = "";
+        //<net_name>, <net_address>, <net_mask>, <IP_range>
+        ret = net_name ;//+ ", " + net_address + ", "+ net_mask + ", " + IP_range;
+        return ret;
+    }
 }

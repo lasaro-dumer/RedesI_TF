@@ -1,0 +1,11 @@
+#NETWORK
+net1,25
+net2,2
+net3,50
+net4,20
+net5,10
+net6,100
+#ROUTER
+r1,3,net1,net3,net2
+r2,3,net2,net4,net6
+r3,3,net3,net5,net4
