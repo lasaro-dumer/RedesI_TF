@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -65,9 +66,9 @@ public class Redes_20151 {
          #ROUTER
          <router_name>, <num_ports>, <(net|router)_name0>, <(net|router)_name1>, …, <(net|router)_nameN>
          */
-        
+
         TipoEntrada tipo = TipoEntrada.Network;
-        
+
         while (linha != null) {
 
             if (linha.equals("#NETWORK")) {
@@ -131,18 +132,59 @@ public class Redes_20151 {
         }
 
         String ipRede = redeCIDR.substring(0, redeCIDR.lastIndexOf("/"));
-        int maxHosts = (int) Math.pow(2, (32 - Integer.parseInt(redeCIDR.substring(redeCIDR.lastIndexOf("/") + 1))));
+        int CIDRValue = Integer.parseInt(redeCIDR.substring(redeCIDR.lastIndexOf("/") + 1));
+        int maxHosts = (int) Math.pow(2, (32 - CIDRValue));
         System.out.println("maxHosts=" + maxHosts);
-        
+
         int qtdSubRedes = redes.size();
-        
-        /*
+
         InetAddress ip = InetAddress.getByName(ipRede);
         byte[] bytesRedeBase = ip.getAddress();
+        String binarRedeIP = "";
+        /*
+        System.out.println(Byte.parseByte("11001000", 2));
+        System.out.println(Byte.parseByte("00010100", 2));
+        System.out.println(Byte.parseByte("00001010", 2));
+        System.out.println(Byte.parseByte("00000000", 2));
+        //*/
+        //1100100000010100
+        //1000000110101110
+        String s = "1100100000010100";
+        int j = Integer.parseInt(s, 2);
+        byte[] a = {(byte) ( j >> 8), (byte) j};
+        System.out.println(Arrays.toString(a));
+        System.out.print(Integer.toBinaryString(0xFF & a[0]) + " " + Integer.toBinaryString(0xFF & a[1]));
+                
         for (byte b : bytesRedeBase) {
-            System.out.print((b & 0xFF) + ".");
+            String s1 = String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0');
+            binarRedeIP += s1;
+            System.out.println("s="+s1);
+//            System.out.println((( Byte.parseByte(((Integer)Integer.parseInt(s1,2)).toString(),2)) & 0xFF));
+            
+            //System.out.println(Integer.parseInt(s1, 2));
+            //System.out.println(b);
+            System.out.println((b & 0xFF));
         }
-        System.out.println();
+        System.out.println("binarRedeIP\t=" + binarRedeIP);
+        String mask = "";
+        for (int i = 0; i < 32; i++) {
+            if (i < CIDRValue) {
+                mask += "1";
+            } else {
+                mask += "0";
+            }
+        }
+        String[] mascarasRedes = gerarMascarasRedes(binarRedeIP, CIDRValue, redes.size());
+        for (int i = 0; i < mascarasRedes.length; i++) {
+            byte[] bytesMascaraRede = { Byte.parseByte(mascarasRedes[i].substring(0, 8),2),
+                                        Byte.parseByte(mascarasRedes[i].substring(8, 16),2),
+                                        Byte.parseByte(mascarasRedes[i].substring(16, 24),2),
+                                        Byte.parseByte(mascarasRedes[i].substring(24),2),
+                                        };
+            InetAddress m = InetAddress.getByAddress(bytesMascaraRede);
+            System.out.println("rede["+(i+1)+"]\t\t="+mascarasRedes[i]);
+        }
+        /*
          bytesRedeBase[3] += 1;
         
          System.out.println(bytesRedeBase[3] & 0xFF);
@@ -178,6 +220,17 @@ public class Redes_20151 {
         }
 
         return routers;
+    }
+
+    private String[] gerarMascarasRedes(String ipRede, int CIDRValue, int qtdRedes) {
+        String[] ret = new String[qtdRedes];
+        String zeros = "00000000000000000000000000000000";
+        for (int i = 0; i < qtdRedes; i++) {
+            String redeBin = Integer.toBinaryString(i);
+            ret[i] = (ipRede.substring(0, CIDRValue) + redeBin + zeros).substring(0, 32);
+        }
+
+        return ret;
     }
 
 }
