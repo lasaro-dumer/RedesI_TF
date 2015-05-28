@@ -14,13 +14,14 @@ class Network extends NetworkElement {
     private String net_name;
     private int num_nodes;
     private String net_address;
-    private String net_mask;
+    private int netCIDR;
+    private int maxHosts;
 
     Network(String net_name, int num_nodes) {
         this.net_name = net_name;
         this.num_nodes = num_nodes;
         net_address = null;
-        net_mask = null;
+        netCIDR = -1;
     }
 
     /**
@@ -42,12 +43,27 @@ class Network extends NetworkElement {
         String ret = "";
         //<net_name>, <net_address>, <net_mask>, <IP_range>
         ret = net_name
-                + (net_address != null ? ", " + net_address : "")
-                + (net_mask != null ? ", " + net_mask + ", " + IP_range(net_address, net_mask) : "");//;
+                + (net_address != null ? ", " + binaryIPtoIPv4(net_address) : "")
+                + (netCIDR > -1 ? "/" + netCIDR + ", " + IP_range(net_address, netCIDR) : "");//;
         return ret;
     }
 
-    private String IP_range(String net_address, String net_mask) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private String IP_range(String net_address, int net_mask) {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return "will be the ip range " + maxHosts;
+    }
+
+    void setNetMask(String subNetAddress, int subNetsCIDR) {
+        net_address = subNetAddress;
+        netCIDR = subNetsCIDR;
+    }
+
+    @Override
+    String getNetMask() {
+        return (net_address != null ? ", " + binaryIPtoIPv4(net_address) : "")+ (netCIDR > -1 ? "/" + netCIDR: "");
+    }
+
+    void setMaxHosts(int maxHosts) {
+        this.maxHosts = maxHosts;
     }
 }

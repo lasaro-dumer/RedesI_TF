@@ -34,7 +34,12 @@ class Router extends NetworkElement {
          #ROUTER
          <router_name>, <num_ports>, <IP0>, <net_mask0>, <IP1> , <net_mask1>, …, <IPN> , <net_maskN>
          */
-        ret = getRouter_name()+ ", " + num_ports;//  + ", "+ IP0 + ", " + net_mask0;
+        ret = getRouter_name() + ", " + num_ports;//  + ", "+ IP0 + ", " + net_mask0;
+        for (int i = 0; i < num_ports; i++) {
+            if (pluged.containsKey(i)) {
+                ret += ", " + i + pluged.get(i).getNetMask();
+            }
+        }
         return ret;
     }
 
@@ -59,15 +64,42 @@ class Router extends NetworkElement {
         return connections;
     }
 
-    public void plug(int netInterface, Network network) {
-        if(!(netInterface > num_ports - 1)){
-            pluged.put(netInterface, network);
-        }else{
-            throw new IllegalArgumentException("Numero da porta inválido{"+netInterface +"}. Máximo:{"+num_ports +"}");
+    public void plug(Network network) throws Exception {
+        int netInterface = getAvailableInterface();
+        if (netInterface > -1) {
+            plug(netInterface, network);
+        } else {
+            throw new Exception("Nenhuma interface disponivel");
+        }
+    }
+    
+    public Network plug(Router router) throws Exception {
+        int netInterface = getAvailableInterface();
+        if (netInterface > -1) {
+            return plug(netInterface, router);
+        } else {
+            throw new Exception("Nenhuma interface disponivel");
         }
     }
 
-    public Network plug(int netInterface, Router router) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private void plug(int netInterface, Network network) {
+        pluged.put(netInterface, network);
+    }
+
+    private Network plug(int netInterface, Router router) throws Exception {
+        Network ret = new Network(this.getRouter_name() + "_" + router.getRouter_name(), 2);
+        this.plug(ret);
+        router.plug(ret);
+        return ret;
+    }
+
+    private int getAvailableInterface() {
+        for (int i = 0; i < num_ports; i++) {
+            if (!pluged.containsKey(i)) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 }

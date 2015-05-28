@@ -1,5 +1,0 @@
-#NETWORK
-net1, 126
-net2, 126
-#ROUTER
-r1, 2, net1, net2
