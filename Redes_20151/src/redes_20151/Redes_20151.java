@@ -32,7 +32,7 @@ public class Redes_20151 {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        try {// TODO code application logic here
+        try {
             if (args.length < 2) {
                 throw new IllegalArgumentException("Numero de argumentos menor que 2.");
             }
@@ -51,6 +51,7 @@ public class Redes_20151 {
 
             app.lerArquivo(args[0]);
             app.executarConfig(args[1]);
+            // TODO Print to file
             if (DEBUG) {
                 app.printElementosRede();
             }
@@ -121,7 +122,6 @@ public class Redes_20151 {
         List<Network> redes = getRedes();
         List<Router> routers = gerRouters();
 
-        //ajustar connected dos routers
         for (Router router : routers) {
             List<String> connections = router.getConnections();
             int netInterface = 0;
@@ -167,14 +167,17 @@ public class Redes_20151 {
         for (int i = 0; i < mascarasRedes.length; i++) {
             Network net = redes.get(i);
             net.setNetMask(mascarasRedes[i], subNetsCIDR);
-            net.setMaxHosts(maxHosts/redes.size());
             if (DEBUG) {
                 System.out.println("rede[" + (i + 1) + "]\t\t=" + mascarasRedes[i]);
             }
         }
+        
+        // TODO Until this line, what is OK: {Networks IP,Mask, and range} {Plugs between networks and routers (not tested)}
+        // TODO what yet need to be done: Router table
     }
 
     private void printElementosRede() {
+        // TODO A print like that should go to the file, maybe work with redirecting a stream ?
         List<Network> redes = getRedes();
         List<Router> routers = gerRouters();
         System.out.println("#NETWORKS");
@@ -186,6 +189,8 @@ public class Redes_20151 {
         for (Router router : routers) {
             System.out.println(router.toString());
         }
+        
+        // TODO Print the router table, if its implemented
     }
 
     private List<Network> getRedes() {
@@ -213,10 +218,10 @@ public class Redes_20151 {
     }
 
     private String[] gerarMascarasRedes(String ipRede, int CIDRValue, int qtdRedes, AtomicReference<Integer> subNetsCIDR) {
+        // TODO That is fine, but not fully tested, the optimizaiton algorithm was not implemented here, only the basic
         String[] ret = new String[qtdRedes];
         String zeros;
         zeros = "00000000000000000000000000000000";
-        //zeros = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
         Integer maxBits = 0;
 

@@ -37,7 +37,7 @@ class Router extends NetworkElement {
         ret = getRouter_name() + ", " + num_ports;//  + ", "+ IP0 + ", " + net_mask0;
         for (int i = 0; i < num_ports; i++) {
             if (pluged.containsKey(i)) {
-                ret += ", " + i + pluged.get(i).getNetMask();
+                ret += ", " + i +"=>" + pluged.get(i).getNetMask();
             }
         }
         return ret;

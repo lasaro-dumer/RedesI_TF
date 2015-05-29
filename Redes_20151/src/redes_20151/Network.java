@@ -15,7 +15,6 @@ class Network extends NetworkElement {
     private int num_nodes;
     private String net_address;
     private int netCIDR;
-    private int maxHosts;
 
     Network(String net_name, int num_nodes) {
         this.net_name = net_name;
@@ -41,16 +40,21 @@ class Network extends NetworkElement {
     @Override
     public String toString() {
         String ret = "";
-        //<net_name>, <net_address>, <net_mask>, <IP_range>
         ret = net_name
-                + (net_address != null ? ", " + binaryIPtoIPv4(net_address) : "")
+                + (net_address != null ? ", " + binaryIPtoStringIPv4(net_address) : "")
                 + (netCIDR > -1 ? "/" + netCIDR + ", " + IP_range(net_address, netCIDR) : "");//;
         return ret;
     }
 
-    private String IP_range(String net_address, int net_mask) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        return "will be the ip range " + maxHosts;
+    private String IP_range(String net_address, int netCIDR) {
+        int availableBits = 32 - netCIDR;
+
+        String minIpAddress = (String.format("%" + (availableBits) + "s", "1").replace(' ', '0'));
+        String maxIpAddress = (String.format("%" + (availableBits) + "s", "0").replace(' ', '1'));
+
+        String minIp = net_address.substring(0, netCIDR) + minIpAddress;
+        String maxIp = net_address.substring(0, netCIDR) + maxIpAddress;
+        return binaryIPtoStringIPv4(minIp) + "-" + binaryIPtoStringIPv4(maxIp);
     }
 
     void setNetMask(String subNetAddress, int subNetsCIDR) {
@@ -60,10 +64,6 @@ class Network extends NetworkElement {
 
     @Override
     String getNetMask() {
-        return (net_address != null ? ", " + binaryIPtoIPv4(net_address) : "")+ (netCIDR > -1 ? "/" + netCIDR: "");
-    }
-
-    void setMaxHosts(int maxHosts) {
-        this.maxHosts = maxHosts;
+        return (net_address != null ? binaryIPtoStringIPv4(net_address) : "") + (netCIDR > -1 ? "/" + netCIDR : "");
     }
 }
