@@ -1,0 +1,8 @@
+#NETWORK
+net1, 100
+net2, 40
+net3, 40
+#ROUTER
+r1, 2, net1, net2
+r2, 2, net2, net3
+r3, 2, net1, net3
