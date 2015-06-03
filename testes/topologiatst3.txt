@@ -1,0 +1,10 @@
+#network
+net1, 60
+net2, 80
+net3, 100
+#router
+r1, 2, net1, net2
+r2, 2, net2, net3
+r3, 3, net1, r1, net3
+
+Endereço de rede: 60.20.46.0/24
