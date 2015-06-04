@@ -55,6 +55,25 @@ public class Redes_20151 {
             if (DEBUG) {
                 app.printElementosRede();
             }
+            
+            /*
+            String one = "1";//(String.format("%32s", "1").replace(' ', '0'));
+            String rede1 = "11001000000101000000101000000000";
+            String rede2 = "11001000000101000000101010000000";
+            System.out.println("one\t\t=" + one);
+            System.out.println("rede1\t\t=" + rede1);
+            System.out.println("rede2\t\t=" + rede2);
+            String prev = rede1;
+            for (int i = 0; i < 10; i++) {
+                prev = binaryMath.addBinary(prev, one);
+                System.out.println("rede1+[" + i + "]\t=" + prev + " = " + NetworkElement.binaryIPtoStringIPv4(prev));
+            }
+            prev = rede2;
+            for (int i = 0; i < 10; i++) {
+                prev = binaryMath.addBinary(prev, one);
+                System.out.println("rede2+[" + i + "]\t=" + prev + " = " + NetworkElement.binaryIPtoStringIPv4(prev));
+            }
+            //*/
         } catch (Exception e) {
             System.out.println("ERROR: " + e.getMessage());
             System.out.println("STACK: ");
@@ -81,10 +100,11 @@ public class Redes_20151 {
         TipoEntrada tipo = TipoEntrada.Network;
 
         while (linha != null) {
-
-            if (linha.equals("#NETWORK")) {
+            linha = linha.toLowerCase();
+            
+            if (linha.equals("#network")) {
                 tipo = TipoEntrada.Network;
-            } else if (linha.equals("#ROUTER")) {
+            } else if (linha.equals("#router")) {
                 tipo = TipoEntrada.Router;
             } else {
                 st = new StringTokenizer(linha, ",");
@@ -132,7 +152,7 @@ public class Redes_20151 {
                             router.plug(((Network) networkElement));
                         }
                     } else if (networkElement instanceof Router) {
-                        if (((Router) networkElement).getRouter_name().equals(connection)) {
+                        if (((Router) networkElement).getName().equals(connection)) {
                             redes.add(router.plug(((Router) networkElement)));
                         }
                     }
@@ -171,26 +191,33 @@ public class Redes_20151 {
                 System.out.println("rede[" + (i + 1) + "]\t\t=" + mascarasRedes[i]);
             }
         }
-        
+
         // TODO Until this line, what is OK: {Networks IP,Mask, and range} {Plugs between networks and routers (not tested)}
         // TODO what yet need to be done: Router table
+        for (Router router : routers) {
+            router.fillRouterTable(redes);
+        }
     }
 
     private void printElementosRede() {
         // TODO A print like that should go to the file, maybe work with redirecting a stream ?
         List<Network> redes = getRedes();
         List<Router> routers = gerRouters();
-        System.out.println("#NETWORKS");
+        System.out.println("#NETWORK");
         for (Network rede : redes) {
             System.out.println(rede.toString());
         }
 
-        System.out.println("#ROUTERS");
+        System.out.println("#ROUTER");
         for (Router router : routers) {
             System.out.println(router.toString());
         }
-        
-        // TODO Print the router table, if its implemented
+
+        // TODO Print the router table, if its implemented        
+        System.out.println("#ROUTERTABLE");
+        for (Router router : routers) {
+            System.out.print(router.routerTableToString());
+        }
     }
 
     private List<Network> getRedes() {

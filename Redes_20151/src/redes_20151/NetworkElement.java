@@ -9,7 +9,7 @@ package redes_20151;
  *
  * @author lasaro
  */
-class NetworkElement {
+abstract class NetworkElement {
 
     public static String binaryIPtoStringIPv4(String binaryIP) {
         return IntegerIPv4toStringIPv4(binaryIPtoIntegerIPv4(binaryIP));
@@ -44,4 +44,6 @@ class NetworkElement {
     String getNetMask() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    abstract String getName();
 }

@@ -5,6 +5,7 @@
  */
 package redes_20151;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,12 +20,14 @@ class Router extends NetworkElement {
     private int num_ports;
     private List<String> connections;
     private Map<Integer, NetworkElement> pluged;
+    private List<TableLine> routerTable;
 
     Router(String router_name, int num_ports, List<String> connections) {
         this.router_name = router_name;
         this.num_ports = num_ports;
         this.connections = connections;
         this.pluged = new HashMap<>();
+        this.routerTable = new ArrayList<>();
     }
 
     @Override
@@ -34,10 +37,11 @@ class Router extends NetworkElement {
          #ROUTER
          <router_name>, <num_ports>, <IP0>, <net_mask0>, <IP1> , <net_mask1>, …, <IPN> , <net_maskN>
          */
-        ret = getRouter_name() + ", " + num_ports;//  + ", "+ IP0 + ", " + net_mask0;
+        ret = getName() + ", " + num_ports;//  + ", "+ IP0 + ", " + net_mask0;
         for (int i = 0; i < num_ports; i++) {
             if (pluged.containsKey(i)) {
-                ret += ", " + i +"=>" + pluged.get(i).getNetMask();
+                ret += ", ";// + i + "=>";
+                ret += pluged.get(i).getNetMask();
             }
         }
         return ret;
@@ -46,7 +50,7 @@ class Router extends NetworkElement {
     /**
      * @return the router_name
      */
-    public String getRouter_name() {
+    public String getName() {
         return router_name;
     }
 
@@ -72,7 +76,7 @@ class Router extends NetworkElement {
             throw new Exception("Nenhuma interface disponivel");
         }
     }
-    
+
     public Network plug(Router router) throws Exception {
         int netInterface = getAvailableInterface();
         if (netInterface > -1) {
@@ -84,10 +88,15 @@ class Router extends NetworkElement {
 
     private void plug(int netInterface, Network network) {
         pluged.put(netInterface, network);
+        if (!network.getNetMask().isEmpty()) {
+            network.connect(this);
+        }else{
+            network.putIPwaitingList(this);
+        }
     }
 
     private Network plug(int netInterface, Router router) throws Exception {
-        Network ret = new Network(this.getRouter_name() + "_" + router.getRouter_name(), 2);
+        Network ret = new Network(this.getName() + "_" + router.getName(), 2);
         this.plug(ret);
         router.plug(ret);
         return ret;
@@ -101,5 +110,56 @@ class Router extends NetworkElement {
         }
 
         return -1;
+    }
+
+    void fillRouterTable(List<Network> redes) {
+        for (Network destination : redes) {
+            for (Map.Entry<Integer, NetworkElement> entry : pluged.entrySet()) {
+                Integer netInterface = entry.getKey();
+                NetworkElement network = entry.getValue();
+                TableLine route = null;
+                if (network.getName().equals(destination.getName())) {
+                    route = new TableLine(this, destination, "0.0.0.0", netInterface);
+                } else if (((Network) network).hasConnectedRouters()) {
+                    route = ((Network) network).route(destination,this, netInterface);
+                }
+                if (route != null) {
+                    routerTable.add(route);
+                    break;
+                }
+            }
+        }
+    }
+
+    public String routerTableToString() {
+        StringBuilder sb = new StringBuilder();
+
+        for (TableLine tableLine : routerTable) {
+            sb.append(tableLine.toString()).append("\n");
+        }
+
+        return sb.toString();
+    }
+
+    boolean knowsRouteTo(Network destination) {
+        for (Map.Entry<Integer, NetworkElement> entry : pluged.entrySet()) {
+            Integer netInterface = entry.getKey();
+            NetworkElement networkElement = entry.getValue();
+            if(networkElement instanceof Network){
+                if(networkElement.getName().equals(destination.getName())){
+                    return true;
+                }
+            }
+        }
+        
+        if (!routerTable.isEmpty()) {
+            for (TableLine tableLine : routerTable) {
+                if(tableLine.getDestination().getName().equals(destination.getName())){
+                    return true;
+                }
+            }
+        }
+        
+        return false;
     }
 }
