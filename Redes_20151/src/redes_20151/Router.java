@@ -19,7 +19,7 @@ class Router extends NetworkElement {
     private String router_name;
     private int num_ports;
     private List<String> connections;
-    private Map<Integer, NetworkElement> pluged;
+    private Map<Integer, Network> pluged;
     private List<TableLine> routerTable;
 
     Router(String router_name, int num_ports, List<String> connections) {
@@ -57,7 +57,7 @@ class Router extends NetworkElement {
     /**
      * @return the num_ports
      */
-    public int getNum_ports() {
+    public int getPortsCount() {
         return num_ports;
     }
 
@@ -112,16 +112,16 @@ class Router extends NetworkElement {
         return -1;
     }
 
-    void fillRouterTable(List<Network> redes) {
+    public void fillRouterTable(List<Network> redes) {
         for (Network destination : redes) {
-            for (Map.Entry<Integer, NetworkElement> entry : pluged.entrySet()) {
+            for (Map.Entry<Integer, Network> entry : pluged.entrySet()) {
                 Integer netInterface = entry.getKey();
-                NetworkElement network = entry.getValue();
+                Network network = entry.getValue();
                 TableLine route = null;
                 if (network.getName().equals(destination.getName())) {
                     route = new TableLine(this, destination, "0.0.0.0", netInterface);
-                } else if (((Network) network).hasConnectedRouters()) {
-                    route = ((Network) network).route(destination,this, netInterface);
+                } else if (network.hasConnectedRouters()) {
+                    route = network.routeTo(destination,this, netInterface);
                 }
                 if (route != null) {
                     routerTable.add(route);
@@ -141,10 +141,10 @@ class Router extends NetworkElement {
         return sb.toString();
     }
 
-    boolean knowsRouteTo(Network destination) {
-        for (Map.Entry<Integer, NetworkElement> entry : pluged.entrySet()) {
+    public boolean knowsRouteTo(Network destination) {
+        for (Map.Entry<Integer, Network> entry : pluged.entrySet()) {
             Integer netInterface = entry.getKey();
-            NetworkElement networkElement = entry.getValue();
+            Network networkElement = entry.getValue();
             if(networkElement instanceof Network){
                 if(networkElement.getName().equals(destination.getName())){
                     return true;

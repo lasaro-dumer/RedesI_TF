@@ -66,7 +66,7 @@ class Network extends NetworkElement {
         return binaryIPtoStringIPv4(minIp) + "-" + binaryIPtoStringIPv4(maxIp);
     }
 
-    void setNetMask(String subNetAddress, int subNetsCIDR) {
+    void setNetworkMask(String subNetAddress, int subNetsCIDR) {
         net_address = subNetAddress;
         netCIDR = subNetsCIDR;
         int availableBits = 32 - netCIDR;
@@ -80,8 +80,7 @@ class Network extends NetworkElement {
         }
     }
 
-    @Override
-    String getNetMask() {
+    public String getNetMask() {
         return (net_address != null ? binaryIPtoStringIPv4(net_address) : "") + (netCIDR > -1 ? "/" + netCIDR : "");
     }
 
@@ -101,7 +100,7 @@ class Network extends NetworkElement {
         return !connections.isEmpty();
     }
 
-    public TableLine route(Network destination,Router source, Integer sourceNetInterface) {
+    public TableLine routeTo(Network destination,Router source, Integer sourceNetInterface) {
         TableLine route = null;
         for (Map.Entry<String, Router> connection : connections.entrySet()) {
             String ip = connection.getKey();

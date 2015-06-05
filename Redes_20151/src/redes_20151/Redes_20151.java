@@ -49,31 +49,9 @@ public class Redes_20151 {
 
             Redes_20151 app = new Redes_20151();
 
-            app.lerArquivo(args[0]);
-            app.executarConfig(args[1]);
-            // TODO Print to file
-            if (DEBUG) {
-                app.printElementosRede();
-            }
-            
-            /*
-            String one = "1";//(String.format("%32s", "1").replace(' ', '0'));
-            String rede1 = "11001000000101000000101000000000";
-            String rede2 = "11001000000101000000101010000000";
-            System.out.println("one\t\t=" + one);
-            System.out.println("rede1\t\t=" + rede1);
-            System.out.println("rede2\t\t=" + rede2);
-            String prev = rede1;
-            for (int i = 0; i < 10; i++) {
-                prev = binaryMath.addBinary(prev, one);
-                System.out.println("rede1+[" + i + "]\t=" + prev + " = " + NetworkElement.binaryIPtoStringIPv4(prev));
-            }
-            prev = rede2;
-            for (int i = 0; i < 10; i++) {
-                prev = binaryMath.addBinary(prev, one);
-                System.out.println("rede2+[" + i + "]\t=" + prev + " = " + NetworkElement.binaryIPtoStringIPv4(prev));
-            }
-            //*/
+            app.readFile(args[0]);
+            app.executeConfig(args[1]);
+            app.printNetworkElements();            
         } catch (Exception e) {
             System.out.println("ERROR: " + e.getMessage());
             System.out.println("STACK: ");
@@ -81,7 +59,7 @@ public class Redes_20151 {
         }
     }
 
-    private List<NetworkElement> lerArquivo(String arquivo) throws FileNotFoundException, IOException, Exception {
+    private List<NetworkElement> readFile(String arquivo) throws FileNotFoundException, IOException, Exception {
         this.networkElements = new ArrayList<>();
 
         File f = new File(arquivo);
@@ -138,7 +116,7 @@ public class Redes_20151 {
         return this.networkElements;
     }
 
-    private void executarConfig(String redeCIDR) throws Exception {
+    private void executeConfig(String redeCIDR) throws Exception {
         List<Network> redes = getRedes();
         List<Router> routers = gerRouters();
 
@@ -181,12 +159,12 @@ public class Redes_20151 {
 
         Integer subNetsCIDR = CIDRValue;
         AtomicReference<Integer> ref = new AtomicReference<Integer>(subNetsCIDR);
-        String[] mascarasRedes = gerarMascarasRedes(binarRedeIP, CIDRValue, redes.size(), ref);
+        String[] mascarasRedes = generateNetworkMasks(binarRedeIP, CIDRValue, redes.size(), ref);
         subNetsCIDR = CIDRValue + ref.get();
 
         for (int i = 0; i < mascarasRedes.length; i++) {
             Network net = redes.get(i);
-            net.setNetMask(mascarasRedes[i], subNetsCIDR);
+            net.setNetworkMask(mascarasRedes[i], subNetsCIDR);
             if (DEBUG) {
                 System.out.println("rede[" + (i + 1) + "]\t\t=" + mascarasRedes[i]);
             }
@@ -199,7 +177,7 @@ public class Redes_20151 {
         }
     }
 
-    private void printElementosRede() {
+    private void printNetworkElements() {
         // TODO A print like that should go to the file, maybe work with redirecting a stream ?
         List<Network> redes = getRedes();
         List<Router> routers = gerRouters();
@@ -244,7 +222,7 @@ public class Redes_20151 {
         return routers;
     }
 
-    private String[] gerarMascarasRedes(String ipRede, int CIDRValue, int qtdRedes, AtomicReference<Integer> subNetsCIDR) {
+    private String[] generateNetworkMasks(String ipRede, int CIDRValue, int qtdRedes, AtomicReference<Integer> subNetsCIDR) {
         // TODO That is fine, but not fully tested, the optimizaiton algorithm was not implemented here, only the basic
         String[] ret = new String[qtdRedes];
         String zeros;
