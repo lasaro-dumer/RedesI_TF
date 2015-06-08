@@ -58,7 +58,7 @@ public class Redes_20151 {
             e.printStackTrace(System.out);
         }
     }
-
+    //PRIMARY FUNCTION
     private List<NetworkElement> readFile(String arquivo) throws FileNotFoundException, IOException, Exception {
         this.networkElements = new ArrayList<>();
 
@@ -115,7 +115,7 @@ public class Redes_20151 {
 
         return this.networkElements;
     }
-
+    //PRIMARY FUNCTION
     private void executeConfig(String redeCIDR) throws Exception {
         List<Network> redes = getRedes();
         List<Router> routers = gerRouters();
@@ -223,7 +223,12 @@ public class Redes_20151 {
     }
 
     private String[] generateNetworkMasks(String ipRede, int CIDRValue, int qtdRedes, AtomicReference<Integer> subNetsCIDR) {
-        // TODO That is fine, but not fully tested, the optimizaiton algorithm was not implemented here, only the basic
+        /* TODO That is fine, but not fully tested, the optimizaiton algorithm was not implemented here, only the basic
+           UPDATE: What's necessary here is do the sort the host quantity demanded per network and do the disbuition of the mask and subnetworks of each network
+           
+           PRIMARY FUNCTION
+        */
+        
         String[] ret = new String[qtdRedes];
         String zeros;
         zeros = "00000000000000000000000000000000";
