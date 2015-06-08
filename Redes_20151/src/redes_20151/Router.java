@@ -67,7 +67,7 @@ class Router extends NetworkElement {
     public List<String> getConnections() {
         return connections;
     }
-
+    // PRIMARY FUNCTION - does the attribution to the Router, Network or the Interface
     public void plug(Network network) throws Exception {
         int netInterface = getAvailableInterface();
         if (netInterface > -1) {
@@ -111,7 +111,7 @@ class Router extends NetworkElement {
 
         return -1;
     }
-
+    //PRIMARY FUNCTION
     public void fillRouterTable(List<Network> redes) {
         for (Network destination : redes) {
             for (Map.Entry<Integer, Network> entry : pluged.entrySet()) {
