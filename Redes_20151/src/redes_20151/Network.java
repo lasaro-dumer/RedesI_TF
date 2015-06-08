@@ -83,7 +83,7 @@ class Network extends NetworkElement {
     public String getNetMask() {
         return (net_address != null ? binaryIPtoStringIPv4(net_address) : "") + (netCIDR > -1 ? "/" + netCIDR : "");
     }
-
+    //PRIMARY FUNCTION - Create connection with the router
     public String connect(Router router) {
         String ip = getNewIP();
         connections.put(ip, router);
