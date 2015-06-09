@@ -22,7 +22,7 @@ class Network extends NetworkElement {
     private String nextAvailableIP;
     private Map<String, Router> connections;
     private Stack<Router> IPwaitingList;
-    
+
     Network(String net_name, int num_nodes) {
         this.net_name = net_name;
         this.num_nodes = num_nodes;
@@ -73,7 +73,7 @@ class Network extends NetworkElement {
 
         String minIpAddress = (String.format("%" + (availableBits) + "s", "1").replace(' ', '0'));
         nextAvailableIP = net_address.substring(0, netCIDR) + minIpAddress;
-        
+
         while (!IPwaitingList.empty()) {
             Router router = IPwaitingList.pop();
             this.connect(router);
@@ -83,13 +83,24 @@ class Network extends NetworkElement {
     public String getNetMask() {
         return (net_address != null ? binaryIPtoStringIPv4(net_address) : "") + (netCIDR > -1 ? "/" + netCIDR : "");
     }
+
     //PRIMARY FUNCTION - Create connection with the router
     public String connect(Router router) {
-        String ip = getNewIP();
-        connections.put(ip, router);
+        String ip = null;
+        if (!getNetMask().isEmpty()) {
+            ip = getNewIP();
+            connections.put(ip, router);
+        } else {
+            putIPwaitingList(router);
+        }
+        
         return ip;
     }
 
+    private void putIPwaitingList(Router router) {
+        IPwaitingList.push(router);
+    }
+    
     private String getNewIP() {
         String ret = nextAvailableIP;
         nextAvailableIP = binaryMath.addBinary(nextAvailableIP, "1");
@@ -100,22 +111,18 @@ class Network extends NetworkElement {
         return !connections.isEmpty();
     }
 
-    public TableLine routeTo(Network destination,Router source, Integer sourceNetInterface) {
+    public TableLine routeTo(Network destination, Router source, Integer sourceNetInterface) {
         TableLine route = null;
         for (Map.Entry<String, Router> connection : connections.entrySet()) {
             String ip = connection.getKey();
             Router router = connection.getValue();
-            if(!router.getName().equals(source.getName())){
-                if(router.knowsRouteTo(destination)){
+            if (!router.getName().equals(source.getName())) {
+                if (router.knowsRouteTo(destination)) {
                     route = new TableLine(source, destination, NetworkElement.binaryIPtoStringIPv4(ip), sourceNetInterface);
                 }
             }
         }
-        
-        return route;
-    }
 
-    void putIPwaitingList(Router router) {
-        IPwaitingList.push(router);
+        return route;
     }
 }

@@ -14,6 +14,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicReference;
@@ -51,13 +52,14 @@ public class Redes_20151 {
 
             app.readFile(args[0]);
             app.executeConfig(args[1]);
-            app.printNetworkElements();            
+            app.printNetworkElements();
         } catch (Exception e) {
             System.out.println("ERROR: " + e.getMessage());
             System.out.println("STACK: ");
             e.printStackTrace(System.out);
         }
     }
+
     //PRIMARY FUNCTION
     private List<NetworkElement> readFile(String arquivo) throws FileNotFoundException, IOException, Exception {
         this.networkElements = new ArrayList<>();
@@ -79,7 +81,7 @@ public class Redes_20151 {
 
         while (linha != null) {
             linha = linha.toLowerCase();
-            
+
             if (linha.equals("#network")) {
                 tipo = TipoEntrada.Network;
             } else if (linha.equals("#router")) {
@@ -115,6 +117,7 @@ public class Redes_20151 {
 
         return this.networkElements;
     }
+
     //PRIMARY FUNCTION
     private void executeConfig(String redeCIDR) throws Exception {
         List<Network> redes = getRedes();
@@ -170,6 +173,8 @@ public class Redes_20151 {
             }
         }
 
+        generateNetworkMasks(binarRedeIP, CIDRValue, redes);
+
         // TODO Until this line, what is OK: {Networks IP,Mask, and range} {Plugs between networks and routers (not tested)}
         // TODO what yet need to be done: Router table
         for (Router router : routers) {
@@ -224,11 +229,11 @@ public class Redes_20151 {
 
     private String[] generateNetworkMasks(String ipRede, int CIDRValue, int qtdRedes, AtomicReference<Integer> subNetsCIDR) {
         /* TODO That is fine, but not fully tested, the optimizaiton algorithm was not implemented here, only the basic
-           UPDATE: What's necessary here is do the sort the host quantity demanded per network and do the disbuition of the mask and subnetworks of each network
+         UPDATE: What's necessary here is do the sort the host quantity demanded per network and do the disbuition of the mask and subnetworks of each network
            
-           PRIMARY FUNCTION
-        */
-        
+         PRIMARY FUNCTION
+         */
+
         String[] ret = new String[qtdRedes];
         String zeros;
         zeros = "00000000000000000000000000000000";
@@ -247,6 +252,32 @@ public class Redes_20151 {
         }
 
         return ret;
+    }
+
+    private void generateNetworkMasks(String binarRedeIP, int CIDRValue, List<Network> redes) {
+        if (DEBUG) {
+            for (int i = 0; i < redes.size(); i++) {
+                Network get = redes.get(i);
+                System.out.println(get.getName() + ":" + get.getNumNodes());
+            }
+        }
+        
+        redes.sort((Network net1, Network net2) -> {
+            if (net1.getNumNodes() < net2.getNumNodes()) {
+                //inverted order  for sort
+                return 1;
+            } else if (net1.getNumNodes() == net2.getNumNodes()) {
+                return 0;
+            }
+            return -1;
+        });
+        
+        if (DEBUG) {
+            for (int i = 0; i < redes.size(); i++) {
+                Network get = redes.get(i);
+                System.out.println(get.getName() + ":" + get.getNumNodes());
+            }
+        }
     }
 
 }

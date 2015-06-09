@@ -88,11 +88,7 @@ class Router extends NetworkElement {
 
     private void plug(int netInterface, Network network) {
         pluged.put(netInterface, network);
-        if (!network.getNetMask().isEmpty()) {
-            network.connect(this);
-        }else{
-            network.putIPwaitingList(this);
-        }
+        network.connect(this);
     }
 
     private Network plug(int netInterface, Router router) throws Exception {
