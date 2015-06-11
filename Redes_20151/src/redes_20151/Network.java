@@ -55,6 +55,17 @@ class Network extends NetworkElement {
         return ret;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Network)) {
+            return false;
+        }
+        if (!this.getName().equals(((Network) obj).getName())) {
+            return false;
+        }
+        return this.getNumNodes() == ((Network) obj).getNumNodes();
+    }
+
     private String IP_range(String net_address, int netCIDR) {
         int availableBits = 32 - netCIDR;
 
@@ -93,14 +104,14 @@ class Network extends NetworkElement {
         } else {
             putIPwaitingList(router);
         }
-        
+
         return ip;
     }
 
     private void putIPwaitingList(Router router) {
         IPwaitingList.push(router);
     }
-    
+
     private String getNewIP() {
         String ret = nextAvailableIP;
         nextAvailableIP = binaryMath.addBinary(nextAvailableIP, "1");

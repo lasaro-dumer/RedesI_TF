@@ -281,15 +281,14 @@ public class Redes_20151 {
         //net.setNetworkMask(mascarasRedes[i], subNetsCIDR);
         List<BitsRange> ranges = new ArrayList<>();
         for (int i = 32; i >= 1; i--) {
-            Integer bits =i;
+            Integer bits = i;
             String mask = (String.format("%" + i + "s", "1").replace(' ', '1'));
-            ranges.add(new BitsRange(bits,mask,0));
+            ranges.add(new BitsRange(bits, mask));
         }
-        for (int i = 0; i < redes.size(); i++) {
-            Network rede = redes.get(i);
+        for (Network rede : redes) {
             for (BitsRange range : ranges) {
-                if(range.min<= rede.getNumNodes() && range.max>=rede.getNumNodes()){
-                    range.count++;
+                if (range.min <= rede.getNumNodes() && range.max >= rede.getNumNodes()) {
+                    range.addNetwork(rede);
                     break;
                 }
             }
@@ -297,7 +296,7 @@ public class Redes_20151 {
 
         if (DEBUG) {
             for (BitsRange range : ranges) {
-                if(range.count>0){
+                if (range.getCount() > 0) {
                     System.out.println(range);
                 }
             }
@@ -309,25 +308,34 @@ public class Redes_20151 {
     }
 
     private static class BitsRange {
+
         public final Integer bits;
         public final String mask;
-        public int count;
         public final int max;
         public final int min;
         public final int CIDR;
+        private List<Network> redes;
 
-        private BitsRange(Integer bits, String mask, int count) {
+        private BitsRange(Integer bits, String mask) {
             this.bits = bits;
             this.CIDR = 32 - this.bits;
             this.mask = mask;
-            this.count = count;
-            this.max = binaryMath.bitArrayToInt(mask.toCharArray())-1;
+            this.redes = new ArrayList<Network>();
+            this.max = binaryMath.bitArrayToInt(mask.toCharArray()) - 1;
             this.min = binaryMath.bitArrayToInt(mask.substring(1).toCharArray());
         }
 
         @Override
         public String toString() {
-            return "bits:"+bits+"|CIDR:"+CIDR+"|mask:"+mask+"|max:"+max+"|min:"+min+"|count:"+count;
+            return "bits:" + bits + "|CIDR:" + CIDR + "|mask:" + mask + "|max:" + max + "|min:" + min + "|count:" + getCount();
+        }
+
+        private void addNetwork(Network rede) {
+            redes.add(rede);
+        }
+
+        private int getCount() {
+            return redes.size();
         }
     }
 

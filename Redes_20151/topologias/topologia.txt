@@ -1,5 +1,7 @@
 #NETWORK
 net1, 126
-net2, 126
+net2, 30
+net3, 62
+net4, 30
 #ROUTER
 r1, 2, net1, net2
