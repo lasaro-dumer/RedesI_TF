@@ -15,7 +15,10 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -248,6 +251,9 @@ public class Redes_20151 {
                 subNetsCIDR.set(maxBits);
             }
             redeBin = (String.format("%" + maxBits + "s", redeBin).replace(' ', '0'));
+            if (DEBUG) {
+                System.out.println("redeBin=" + redeBin + ", int=" + binaryMath.bitArrayToInt(redeBin.toCharArray()));
+            }
             ret[i] = (ipRede.substring(0, CIDRValue) + redeBin + zeros).substring(0, 32);
         }
 
@@ -257,11 +263,11 @@ public class Redes_20151 {
     private void generateNetworkMasks(String binarRedeIP, int CIDRValue, List<Network> redes) {
         if (DEBUG) {
             for (int i = 0; i < redes.size(); i++) {
-                Network get = redes.get(i);
-                System.out.println(get.getName() + ":" + get.getNumNodes());
+                Network rede = redes.get(i);
+                //System.out.println(rede.getName() + ":" + rede.getNumNodes());
             }
         }
-        
+
         redes.sort((Network net1, Network net2) -> {
             if (net1.getNumNodes() < net2.getNumNodes()) {
                 //inverted order  for sort
@@ -271,12 +277,57 @@ public class Redes_20151 {
             }
             return -1;
         });
-        
-        if (DEBUG) {
-            for (int i = 0; i < redes.size(); i++) {
-                Network get = redes.get(i);
-                System.out.println(get.getName() + ":" + get.getNumNodes());
+
+        //net.setNetworkMask(mascarasRedes[i], subNetsCIDR);
+        List<BitsRange> ranges = new ArrayList<>();
+        for (int i = 32; i >= 1; i--) {
+            Integer bits =i;
+            String mask = (String.format("%" + i + "s", "1").replace(' ', '1'));
+            ranges.add(new BitsRange(bits,mask,0));
+        }
+        for (int i = 0; i < redes.size(); i++) {
+            Network rede = redes.get(i);
+            for (BitsRange range : ranges) {
+                if(range.min<= rede.getNumNodes() && range.max>=rede.getNumNodes()){
+                    range.count++;
+                    break;
+                }
             }
+        }
+
+        if (DEBUG) {
+            for (BitsRange range : ranges) {
+                if(range.count>0){
+                    System.out.println(range);
+                }
+            }
+            for (int i = 0; i < redes.size(); i++) {
+                Network rede = redes.get(i);
+                //System.out.println(rede.getName() + ":" + rede.getNumNodes());
+            }
+        }
+    }
+
+    private static class BitsRange {
+        public final Integer bits;
+        public final String mask;
+        public int count;
+        public final int max;
+        public final int min;
+        public final int CIDR;
+
+        private BitsRange(Integer bits, String mask, int count) {
+            this.bits = bits;
+            this.CIDR = 32 - this.bits;
+            this.mask = mask;
+            this.count = count;
+            this.max = binaryMath.bitArrayToInt(mask.toCharArray())-1;
+            this.min = binaryMath.bitArrayToInt(mask.substring(1).toCharArray());
+        }
+
+        @Override
+        public String toString() {
+            return "bits:"+bits+"|CIDR:"+CIDR+"|mask:"+mask+"|max:"+max+"|min:"+min+"|count:"+count;
         }
     }
 

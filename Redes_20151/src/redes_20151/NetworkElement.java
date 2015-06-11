@@ -31,11 +31,7 @@ abstract class NetworkElement {
         int last = 0;
         int next = last + 8;
         for (int i = 0; i < parts.length; i++) {
-            char[] bits = binaryIP.substring(last, next).toCharArray();
-            for (int j = 0, e = bits.length - 1; j < bits.length; j++, e--) {
-                int bit = Integer.parseInt("" + bits[j]);
-                parts[i] += (bit == 1 ? Math.pow(2, e) : 0);
-            }            
+            parts[i] = binaryMath.bitArrayToInt(binaryIP.substring(last, next).toCharArray());
             last = next;
             next = last + 8;
         }

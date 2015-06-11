@@ -50,4 +50,13 @@ public class binaryMath {
         }
 
     }
+    
+    public static int bitArrayToInt(char[] bits){
+        int ret=0;
+        for (int j = 0, e = bits.length - 1; j < bits.length; j++, e--) {
+            int bit = Integer.parseInt("" + bits[j]);
+            ret += (bit == 1 ? Math.pow(2, e) : 0);
+        } 
+        return ret;
+    }
 }
