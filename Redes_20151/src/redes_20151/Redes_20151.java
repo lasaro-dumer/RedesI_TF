@@ -162,7 +162,8 @@ public class Redes_20151 {
             System.out.println("\t\t 12345678901234567890123456789012");
             System.out.println("binarRedeIP\t=" + binarRedeIP);
         }
-
+        
+        /*
         Integer subNetsCIDR = CIDRValue;
         AtomicReference<Integer> ref = new AtomicReference<Integer>(subNetsCIDR);
         String[] mascarasRedes = generateNetworkMasks(binarRedeIP, CIDRValue, redes.size(), ref);
@@ -175,7 +176,8 @@ public class Redes_20151 {
                 System.out.println("rede[" + (i + 1) + "]\t\t=" + mascarasRedes[i]);
             }
         }
-
+        //*/
+        
         generateNetworkMasks(binarRedeIP, CIDRValue, redes);
 
         // TODO Until this line, what is OK: {Networks IP,Mask, and range} {Plugs between networks and routers (not tested)}
@@ -281,9 +283,7 @@ public class Redes_20151 {
         //net.setNetworkMask(mascarasRedes[i], subNetsCIDR);
         List<BitsRange> ranges = new ArrayList<>();
         for (int i = 32; i >= 1; i--) {
-            Integer bits = i;
-            String mask = (String.format("%" + i + "s", "1").replace(' ', '1'));
-            ranges.add(new BitsRange(bits, mask));
+            ranges.add(new BitsRange(i));
         }
         for (Network rede : redes) {
             for (BitsRange range : ranges) {
@@ -291,6 +291,44 @@ public class Redes_20151 {
                     range.addNetwork(rede);
                     break;
                 }
+            }
+        }
+        boolean houstonWeHaveAProblem = false;
+        for (BitsRange range : ranges) {
+            if (range.getCount() > 2) {
+                houstonWeHaveAProblem = true;
+                break;
+            }
+        }
+
+        if (houstonWeHaveAProblem) {
+            ranges = sortThatShitOut(ranges);
+        }
+
+        String zeros;
+        zeros = "00000000000000000000000000000000";
+        
+        for (BitsRange range : ranges) {
+            List<Network> redesRange = range.getRedes();
+            int qtdRedes = redesRange.size();
+            Integer maxBits = 0;
+            
+            for (int i = qtdRedes - 1; i >= 0; i--) {
+                Network rede = redesRange.get(i);
+                //int i = range.bits;
+                String redeBin = Integer.toBinaryString(i);
+                String mask = redeBin;
+                if (i == qtdRedes - 1) {
+                    maxBits = (32-range.bits);//redeBin.length();
+                    //subNetsCIDR.set(maxBits);
+                }
+                redeBin = (String.format("%" + maxBits + "s", redeBin).replace(' ', '0'));
+                mask = (binarRedeIP.substring(0, CIDRValue) + redeBin + zeros).substring(0, 32);
+                if (DEBUG) {
+                    System.out.println("redeBin=" + redeBin + ", int=" + binaryMath.bitArrayToInt(redeBin.toCharArray()));
+                    System.out.println("rede[" + rede.getName() + "]\t\t=" + mask + "/"+(32-range.bits));
+                }
+                rede.setNetworkMask(mask, (32-range.bits));
             }
         }
 
@@ -307,6 +345,10 @@ public class Redes_20151 {
         }
     }
 
+    private List<BitsRange> sortThatShitOut(List<BitsRange> ranges) {
+        return ranges;
+    }
+
     private static class BitsRange {
 
         public final Integer bits;
@@ -316,11 +358,11 @@ public class Redes_20151 {
         public final int CIDR;
         private List<Network> redes;
 
-        private BitsRange(Integer bits, String mask) {
+        private BitsRange(Integer bits) {
             this.bits = bits;
             this.CIDR = 32 - this.bits;
-            this.mask = mask;
-            this.redes = new ArrayList<Network>();
+            this.mask = (String.format("%" + this.bits + "s", "1").replace(' ', '1'));;
+            this.redes = new ArrayList<>();
             this.max = binaryMath.bitArrayToInt(mask.toCharArray()) - 1;
             this.min = binaryMath.bitArrayToInt(mask.substring(1).toCharArray());
         }
@@ -331,11 +373,18 @@ public class Redes_20151 {
         }
 
         private void addNetwork(Network rede) {
-            redes.add(rede);
+            getRedes().add(rede);
         }
 
         private int getCount() {
-            return redes.size();
+            return getRedes().size();
+        }
+
+        /**
+         * @return the redes
+         */
+        public List<Network> getRedes() {
+            return redes;
         }
     }
 

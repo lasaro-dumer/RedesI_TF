@@ -7,6 +7,7 @@ package redes_20151;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Stack;
 
 /**
@@ -64,6 +65,14 @@ class Network extends NetworkElement {
             return false;
         }
         return this.getNumNodes() == ((Network) obj).getNumNodes();
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 13 * hash + Objects.hashCode(this.net_name);
+        hash = 13 * hash + this.num_nodes;
+        return hash;
     }
 
     private String IP_range(String net_address, int netCIDR) {
