@@ -319,7 +319,7 @@ public class Redes_20151 {
                 String redeBin = Integer.toBinaryString(i);
                 String mask = redeBin;
                 if (i == qtdRedes - 1) {
-                    maxBits = (32-range.bits);//redeBin.length();
+                    maxBits = redeBin.length();
                     //subNetsCIDR.set(maxBits);
                 }
                 redeBin = (String.format("%" + maxBits + "s", redeBin).replace(' ', '0'));
