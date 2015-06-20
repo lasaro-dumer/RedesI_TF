@@ -51,8 +51,8 @@ class Network extends NetworkElement {
     public String toString() {
         String ret = "";
         ret = net_name
-                + (net_address != null ? ", " + binaryIPtoStringIPv4(net_address) : "")
-                + (netCIDR > -1 ? "/" + netCIDR + ", " + IP_range(net_address, netCIDR) : "");//;
+                + (getNet_address() != null ? ", " + binaryIPtoStringIPv4(getNet_address()) : "")
+                + (getNetCIDR() > -1 ? "/" + getNetCIDR() + ", " + IP_range(getNet_address(), getNetCIDR()) : "");//;
         return ret;
     }
 
@@ -89,10 +89,10 @@ class Network extends NetworkElement {
     void setNetworkMask(String subNetAddress, int subNetsCIDR) {
         net_address = subNetAddress;
         netCIDR = subNetsCIDR;
-        int availableBits = 32 - netCIDR;
+        int availableBits = 32 - getNetCIDR();
 
         String minIpAddress = (String.format("%" + (availableBits) + "s", "1").replace(' ', '0'));
-        nextAvailableIP = net_address.substring(0, netCIDR) + minIpAddress;
+        nextAvailableIP = getNet_address().substring(0, getNetCIDR()) + minIpAddress;
 
         while (!IPwaitingList.empty()) {
             Router router = IPwaitingList.pop();
@@ -101,7 +101,7 @@ class Network extends NetworkElement {
     }
 
     public String getNetMask() {
-        return (net_address != null ? binaryIPtoStringIPv4(net_address) : "") + (netCIDR > -1 ? "/" + netCIDR : "");
+        return (getNet_address() != null ? binaryIPtoStringIPv4(getNet_address()) : "") + (getNetCIDR() > -1 ? "/" + getNetCIDR() : "");
     }
 
     //PRIMARY FUNCTION - Create connection with the router
@@ -144,5 +144,19 @@ class Network extends NetworkElement {
         }
 
         return route;
+    }
+
+    /**
+     * @return the netCIDR
+     */
+    public int getNetCIDR() {
+        return netCIDR;
+    }
+
+    /**
+     * @return the net_address
+     */
+    public String getNet_address() {
+        return net_address;
     }
 }

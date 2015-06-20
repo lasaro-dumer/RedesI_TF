@@ -3,4 +3,4 @@ net1, 400
 net2, 50
 net3, 100
 #ROUTER
-r1, 3, net1, net2, net2
+r1, 3, net1, net2, net3

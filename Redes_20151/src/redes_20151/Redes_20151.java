@@ -162,22 +162,21 @@ public class Redes_20151 {
             System.out.println("\t\t 12345678901234567890123456789012");
             System.out.println("binarRedeIP\t=" + binarRedeIP);
         }
-        
-        /*
-        Integer subNetsCIDR = CIDRValue;
-        AtomicReference<Integer> ref = new AtomicReference<Integer>(subNetsCIDR);
-        String[] mascarasRedes = generateNetworkMasks(binarRedeIP, CIDRValue, redes.size(), ref);
-        subNetsCIDR = CIDRValue + ref.get();
 
-        for (int i = 0; i < mascarasRedes.length; i++) {
-            Network net = redes.get(i);
-            net.setNetworkMask(mascarasRedes[i], subNetsCIDR);
-            if (DEBUG) {
-                System.out.println("rede[" + (i + 1) + "]\t\t=" + mascarasRedes[i]);
-            }
-        }
-        //*/
-        
+        /*
+         Integer subNetsCIDR = CIDRValue;
+         AtomicReference<Integer> ref = new AtomicReference<Integer>(subNetsCIDR);
+         String[] mascarasRedes = generateNetworkMasks(binarRedeIP, CIDRValue, redes.size(), ref);
+         subNetsCIDR = CIDRValue + ref.get();
+
+         for (int i = 0; i < mascarasRedes.length; i++) {
+         Network net = redes.get(i);
+         net.setNetworkMask(mascarasRedes[i], subNetsCIDR);
+         if (DEBUG) {
+         System.out.println("rede[" + (i + 1) + "]\t\t=" + mascarasRedes[i]);
+         }
+         }
+         //*/
         generateNetworkMasks(binarRedeIP, CIDRValue, redes);
 
         // TODO Until this line, what is OK: {Networks IP,Mask, and range} {Plugs between networks and routers (not tested)}
@@ -190,6 +189,15 @@ public class Redes_20151 {
     private void printNetworkElements() {
         // TODO A print like that should go to the file, maybe work with redirecting a stream ?
         List<Network> redes = getRedes();
+//        redes.sort((Network net1, Network net2) -> {
+//            if (net1.getNumNodes() < net2.getNumNodes()) {
+//                //inverted order  for sort
+//                return 1;
+//            } else if (net1.getNumNodes() == net2.getNumNodes()) {
+//                return 0;
+//            }
+//            return -1;
+//        });
         List<Router> routers = gerRouters();
         System.out.println("#NETWORK");
         for (Network rede : redes) {
@@ -275,7 +283,7 @@ public class Redes_20151 {
                 //inverted order  for sort
                 return 1;
             } else if (net1.getNumNodes() == net2.getNumNodes()) {
-                return 0;
+                return net2.getName().compareTo(net1.getName());
             }
             return -1;
         });
@@ -307,28 +315,46 @@ public class Redes_20151 {
 
         String zeros;
         zeros = "00000000000000000000000000000000";
-        
+        int nextCIDRValue = CIDRValue;
+        String nextbinarRedeIP = binarRedeIP;
+
         for (BitsRange range : ranges) {
             List<Network> redesRange = range.getRedes();
+
             int qtdRedes = redesRange.size();
-            Integer maxBits = 0;
-            
-            for (int i = qtdRedes - 1; i >= 0; i--) {
-                Network rede = redesRange.get(i);
-                //int i = range.bits;
-                String redeBin = Integer.toBinaryString(i);
-                String mask = redeBin;
-                if (i == qtdRedes - 1) {
-                    maxBits = redeBin.length();
-                    //subNetsCIDR.set(maxBits);
+            if (qtdRedes > 0) {
+                Integer maxBits = 0;
+
+                maxBits = Integer.toBinaryString(qtdRedes - 1).length();
+                //subNetsCIDR.set(maxBits);
+                //nextCIDRValue = (32 - range.bits);
+                //nextbinarRedeIP = mask;
+
+                for (int i = 0; i < qtdRedes; i++) {
+                    Network rede = redesRange.get(i);
+                    //int i = range.bits;
+                    String redeBin = Integer.toBinaryString(i);
+                    String mask = redeBin;
+                    redeBin = (String.format("%" + maxBits + "s", redeBin).replace(' ', '0'));
+                    mask = (nextbinarRedeIP.substring(0, (32 - range.bits-1)) + redeBin + zeros).substring(0, 32);
+                    if (DEBUG) {
+                        System.out.println("nextCIDR=" + nextCIDRValue + " ,range.bits" + (32 - range.bits-1));
+                        System.out.println("redeBin=" + redeBin + ", int=" + binaryMath.bitArrayToInt(redeBin.toCharArray()));
+                        System.out.println("rede[" + rede.getName() + "]\t\t=" + mask + "/" + (32 - range.bits));
+                    }
+                    rede.setNetworkMask(mask, (32 - range.bits));
                 }
-                redeBin = (String.format("%" + maxBits + "s", redeBin).replace(' ', '0'));
-                mask = (binarRedeIP.substring(0, CIDRValue) + redeBin + zeros).substring(0, 32);
-                if (DEBUG) {
-                    System.out.println("redeBin=" + redeBin + ", int=" + binaryMath.bitArrayToInt(redeBin.toCharArray()));
-                    System.out.println("rede[" + rede.getName() + "]\t\t=" + mask + "/"+(32-range.bits));
-                }
-                rede.setNetworkMask(mask, (32-range.bits));
+                Network rede = redesRange.get(qtdRedes - 1);
+                nextCIDRValue = rede.getNetCIDR();
+                nextbinarRedeIP = rede.getNet_address();
+                //nextbinarRedeIP = (nextbinarRedeIP.substring(0, nextCIDRValue) + "1" + zeros).substring(0, 32);
+                //nextbinarRedeIP = (binaryMath.addBinary(nextbinarRedeIP.substring(0, nextCIDRValue), "1") + zeros).substring(0, 32);
+                nextbinarRedeIP = (nextbinarRedeIP.substring(0, nextbinarRedeIP.lastIndexOf("1") + 1) + "1" + zeros).substring(0, 32);
+//                if (DEBUG) {
+//                    System.out.println("nextCIDRValue\t=" + nextCIDRValue);
+//                    System.out.println("getNet_address\t=" + rede.getNet_address());
+//                    System.out.println("nextbinarRedeIP\t=" + nextbinarRedeIP);
+//                }
             }
         }
 
