@@ -138,7 +138,7 @@ class Network extends NetworkElement {
             Router router = connection.getValue();
             if (!router.getName().equals(source.getName())) {
                 if (router.knowsRouteTo(destination)) {
-                    route = new TableLine(source, destination, NetworkElement.binaryIPtoStringIPv4(ip), sourceNetInterface);
+                    route = new TableLine(source, destination, NetworkElement.binaryIPtoStringIPv4(ip),router.getName(), sourceNetInterface);
                 }
             }
         }

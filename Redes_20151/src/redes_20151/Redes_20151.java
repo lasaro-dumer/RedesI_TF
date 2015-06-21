@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class Redes_20151 {
 
     private static boolean DEBUG;
+    private static boolean RUNOPTIMIZATION;
 
     private List<NetworkElement> networkElements;
 
@@ -40,9 +41,15 @@ public class Redes_20151 {
             if (args.length < 2) {
                 throw new IllegalArgumentException("Numero de argumentos menor que 2.");
             }
-
+            DEBUG = false;
+            RUNOPTIMIZATION = false;
+            
             if (args.length >= 3) {
                 DEBUG = (args[2].toLowerCase().equals("true"));
+            }
+
+            if (args.length >= 4) {
+                RUNOPTIMIZATION = (args[3].toLowerCase().equals("true"));
             }
 
             if (DEBUG) {
@@ -159,26 +166,26 @@ public class Redes_20151 {
             binarRedeIP += s1;
         }
         if (DEBUG) {
-            System.out.println("\t\t 12345678901234567890123456789012");
-            System.out.println("binarRedeIP\t=" + binarRedeIP);
+            System.out.println("\t\t\t 12345678901234567890123456789012");
+            System.out.println("binarRedeIP\t\t=" + binarRedeIP);
         }
 
-        /*
-         Integer subNetsCIDR = CIDRValue;
-         AtomicReference<Integer> ref = new AtomicReference<Integer>(subNetsCIDR);
-         String[] mascarasRedes = generateNetworkMasks(binarRedeIP, CIDRValue, redes.size(), ref);
-         subNetsCIDR = CIDRValue + ref.get();
+        if (RUNOPTIMIZATION) {
+            generateNetworkMasks(binarRedeIP, CIDRValue, redes);
+        } else {
+            Integer subNetsCIDR = CIDRValue;
+            AtomicReference<Integer> ref = new AtomicReference<Integer>(subNetsCIDR);
+            String[] mascarasRedes = generateNetworkMasks(binarRedeIP, CIDRValue, redes.size(), ref);
+            subNetsCIDR = CIDRValue + ref.get();
 
-         for (int i = 0; i < mascarasRedes.length; i++) {
-         Network net = redes.get(i);
-         net.setNetworkMask(mascarasRedes[i], subNetsCIDR);
-         if (DEBUG) {
-         System.out.println("rede[" + (i + 1) + "]\t\t=" + mascarasRedes[i]);
-         }
-         }
-         //*/
-        generateNetworkMasks(binarRedeIP, CIDRValue, redes);
-
+            for (int i = 0; i < mascarasRedes.length; i++) {
+                Network net = redes.get(i);
+                net.setNetworkMask(mascarasRedes[i], subNetsCIDR);
+                if (DEBUG) {
+                    System.out.println("rede[" + (i + 1) + "]\t\t=" + mascarasRedes[i]);
+                }
+            }
+        }
         // TODO Until this line, what is OK: {Networks IP,Mask, and range} {Plugs between networks and routers (not tested)}
         // TODO what yet need to be done: Router table
         for (Router router : routers) {
@@ -315,6 +322,8 @@ public class Redes_20151 {
 
         String zeros;
         zeros = "00000000000000000000000000000000";
+        String ones;
+        ones = "11111111111111111111111111111111";
         int nextCIDRValue = CIDRValue;
         String nextbinarRedeIP = binarRedeIP;
 
@@ -336,11 +345,11 @@ public class Redes_20151 {
                     String redeBin = Integer.toBinaryString(i);
                     String mask = redeBin;
                     redeBin = (String.format("%" + maxBits + "s", redeBin).replace(' ', '0'));
-                    mask = (nextbinarRedeIP.substring(0, (32 - range.bits-1)) + redeBin + zeros).substring(0, 32);
+                    mask = (nextbinarRedeIP.substring(0, (32 - range.bits - 1)) + redeBin + zeros).substring(0, 32);
                     if (DEBUG) {
-                        System.out.println("nextCIDR=" + nextCIDRValue + " ,range.bits" + (32 - range.bits-1));
-                        System.out.println("redeBin=" + redeBin + ", int=" + binaryMath.bitArrayToInt(redeBin.toCharArray()));
-                        System.out.println("rede[" + rede.getName() + "]\t\t=" + mask + "/" + (32 - range.bits));
+                        //System.out.println("nextCIDR=" + nextCIDRValue + " ,range.bits" + (32 - range.bits-1));
+                        //System.out.println("redeBin=" + redeBin + ", int=" + binaryMath.bitArrayToInt(redeBin.toCharArray()));
+                        System.out.println("rede[" + rede.getName() + "]\t" + redeBin + ":" + binaryMath.bitArrayToInt(redeBin.toCharArray()) + "\t=" + mask + "/" + (32 - range.bits));
                     }
                     rede.setNetworkMask(mask, (32 - range.bits));
                 }
@@ -349,13 +358,16 @@ public class Redes_20151 {
                 nextbinarRedeIP = rede.getNet_address();
                 //nextbinarRedeIP = (nextbinarRedeIP.substring(0, nextCIDRValue) + "1" + zeros).substring(0, 32);
                 //nextbinarRedeIP = (binaryMath.addBinary(nextbinarRedeIP.substring(0, nextCIDRValue), "1") + zeros).substring(0, 32);
-                nextbinarRedeIP = (nextbinarRedeIP.substring(0, nextbinarRedeIP.lastIndexOf("1") + 1) + "1" + zeros).substring(0, 32);
+                //nextbinarRedeIP = (nextbinarRedeIP.substring(0, nextbinarRedeIP.lastIndexOf("1") + 1) + "1" + zeros).substring(0, 32);
 //                if (DEBUG) {
 //                    System.out.println("nextCIDRValue\t=" + nextCIDRValue);
 //                    System.out.println("getNet_address\t=" + rede.getNet_address());
 //                    System.out.println("nextbinarRedeIP\t=" + nextbinarRedeIP);
 //                }
+            } else {
+                nextCIDRValue = range.CIDR;
             }
+            nextbinarRedeIP = ((nextbinarRedeIP.substring(0, CIDRValue) + (ones.substring(0, Math.abs(nextCIDRValue - CIDRValue)))) + zeros).substring(0, 32);
         }
 
         if (DEBUG) {

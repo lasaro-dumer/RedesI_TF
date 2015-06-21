@@ -10,5 +10,3 @@ r1, 2, net1, net2
 r2, 3, net2, net3, net6
 r3, 3, net4, net5, net6
 r4, 2, net2, net3
-
-Endereço de rede: 26.120.15.0/21

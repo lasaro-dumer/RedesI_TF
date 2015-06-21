@@ -8,5 +8,3 @@ net5, 90
 r1, 4, net1, net2, net4, net5
 r2, 2, net2, net3
 r3, 2, net3, net5
-
-Endereço de rede: 30.66.120.0/28

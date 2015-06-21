@@ -6,5 +6,3 @@ net4, 20
 #ROUTER
 r1, 3, net1, net2, net3
 r2, 2, net2, net4
-
-Endereço de rede: 16.44.200.0/22

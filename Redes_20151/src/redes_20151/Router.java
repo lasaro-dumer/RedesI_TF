@@ -115,7 +115,7 @@ class Router extends NetworkElement {
                 Network network = entry.getValue();
                 TableLine route = null;
                 if (network.getName().equals(destination.getName())) {
-                    route = new TableLine(this, destination, "0.0.0.0", netInterface);
+                    route = new TableLine(this, destination, "0.0.0.0",getName(), netInterface);
                 } else if (network.hasConnectedRouters()) {
                     route = network.routeTo(destination,this, netInterface);
                 }
